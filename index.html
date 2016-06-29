@@ -1,47 +1,98 @@
-<!doctype html>
-<html ng-app="galleryApp">
+<!DOCTYPE html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<html lang="en">
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>Xiuyi's Gallery</title>
-    <meta name="description" content="AngularJS-based Gallery Application">
-    <meta name="authoer" content="Xiuyi Ye">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
-          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-    <script>
-        angular.module("galleryApp", ["customFilters"]);
+    <script
+            type="text/javascript" i
+            src="http://d3js.org/d3.v3.min.js">
     </script>
-    <script src="controllers/gallery.js"></script>
-    <script src="filters/customFilters.js"></script>
+    <script
+            type="text/javascript"
+            src="http://d3js.org/queue.v1.min.js">
+    </script>
 </head>
-<body ng-controller="visCtrl">
-<div class="navbar navbar-inverse">
-    <a class="navbar-brand" href="#">XIUYI'S GALLERY</a>
-</div>
-<div class="panel panel-default row">
-    <div class="col-xs-3">
-        <a ng-click=""selectCategory()"
-            class="btn btn-block btn-default btn-lg">Home</a>
-        <a ng-repeat="vis in data.visuals | orderBy: 'category' | unique: 'category'"
-            ng-click="selectCategory(vis)" class="btn btn-block btn-default btn-lg">{{vis}}</a>
-    </div>
-    <div class="col-xs-8">
-        <div class="well" ng-repeat="vis in data.visuals">
-            <h3>
-                <strong>{{vis.name}}</strong>
-                <span class="pull-right label label-primary">
-                    {{vis.createDate}}
-                </span>
-            </h3>
-            <span class="lead">{{vis.description}}</span>
-        </div>
-    </div>
-</div>
-</body>
+<body>
+<script type="text/javascript">
 
+    /* Set the diagrams Height & Width */
+    var h = 500, w = 950;
+    /* Set the color scale we want to use */
+    var color = d3.scale.category20();
+    /* Establish/instantiate an SVG container object */
+    var svg = d3.select("body")
+            .append("svg")
+            .attr("height",h)
+            .attr("width",w);
+    /* Build the directional arrows for the links/edges */
+    svg.append("svg:defs")
+            .selectAll("marker")
+            .data(["end"])
+            .enter().append("svg:marker")
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 15)
+            .attr("refY", -1.5)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5");
+    /* Pre-Load the json data using the queue library */
+    queue()
+            .defer(d3.json, "nodes.json")
+            .defer(d3.json, "links.json")
+            .await(makeDiag);
+    /* Define the main worker or execution function */
+    function makeDiag(error, nodes, links, table) {
+        /* Draw the node labels first */
+        var texts = svg.selectAll("text")
+                .data(nodes)
+                .enter()
+                .append("text")
+                .attr("fill", "black")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "10px")
+                .text(function(d) { return d.name; });
+        /* Establish the dynamic force behavor of the nodes */
+        var force = d3.layout.force()
+                .nodes(nodes)
+                .links(links)
+                .size([w,h])
+                .linkDistance([250])
+                .charge([-1500])
+                .gravity(0.3)
+                .start();
+        /* Draw the edges/links between the nodes */
+        var edges = svg.selectAll("line")
+                .data(links)
+                .enter()
+                .append("line")
+                .style("stroke", "#ccc")
+                .style("stroke-width", 1)
+                .attr("marker-end", "url(#end)");
+        /* Draw the nodes themselves */
+        var nodes = svg.selectAll("circle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("r", 20)
+                .attr("opacity", 0.5)
+                .style("fill", function(d,i) { return color(i); })
+                .call(force.drag);
+        /* Run the Force effect */
+        force.on("tick", function() {
+            edges.attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+            nodes.attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; })
+            texts.attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+        }); // End tick func
+    }; // End makeDiag worker func
+</script>
+</body>
 </html>
