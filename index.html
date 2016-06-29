@@ -14,17 +14,21 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
           integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <script>
-        angular.module("galleryApp", []);
+        angular.module("galleryApp", ["customFilters"]);
     </script>
     <script src="controllers/gallery.js"></script>
+    <script src="filters/customFilters.js"></script>
 </head>
 <body ng-controller="visCtrl">
 <div class="navbar navbar-inverse">
     <a class="navbar-brand" href="#">XIUYI'S GALLERY</a>
 </div>
 <div class="panel panel-default row">
-    <div class="col-xs-2">
-        D3 Galleries
+    <div class="col-xs-3">
+        <a ng-click=""selectCategory()"
+            class="btn btn-block btn-default btn-lg">Home</a>
+        <a ng-repeat="vis in data.visuals | orderBy: 'category' | unique: 'category'"
+            ng-click="selectCategory(vis)" class="btn btn-block btn-default btn-lg">{{vis}}</a>
     </div>
     <div class="col-xs-8">
         <div class="well" ng-repeat="vis in data.visuals">
