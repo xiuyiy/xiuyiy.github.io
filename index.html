@@ -16,19 +16,28 @@
     <script>
         angular.module("galleryApp", []);
     </script>
+    <script src="controllers/gallery.js"></script>
 </head>
-<body>
-    <div class="navbar navbar-inverse">
-        <a class="navbar-brand" href="#">XIUYI'S GALLERY</a>
+<body ng-controller="visCtrl">
+<div class="navbar navbar-inverse">
+    <a class="navbar-brand" href="#">XIUYI'S GALLERY</a>
+</div>
+<div class="panel panel-default row">
+    <div class="col-xs-2">
+        D3 Galleries
     </div>
-    <div class="panel panel-default row">
-        <div class="col-xs-2">
-            D3 Galleries
-        </div>
-        <div class="col-xs-8">
-            Products go here
+    <div class="col-xs-8">
+        <div class="well" ng-repeat="vis in data.visuals">
+            <h3>
+                <strong>{{vis.name}}</strong>
+                <span class="pull-right label label-primary">
+                    {{vis.createDate}}
+                </span>
+            </h3>
+            <span class="lead">{{vis.description}}</span>
         </div>
     </div>
+</div>
 </body>
 
 </html>
