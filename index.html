@@ -1,11 +1,33 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<body>
-<script src="https://d3js.org/d3.v3.min.js"></script>
+<!doctype html>
+<html ng-app="galleryApp">
+<head>
+    <meta charset="utf-8">
+    <title>Xiuyi's Gallery</title>
+    <meta name="description" content="AngularJS-based Gallery Application">
+    <meta name="authoer" content="Xiuyi Ye">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script>
+        angular.module("galleryApp", ["customFilters"]);
+    </script>
+    <script src="controllers/gallery.js"></script>
+    <script src="filters/customFilters.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+</head>
+<body ng-controller="visCtrl">
+<div class="navbar navbar-inverse">
+    <a class="navbar-brand" href="#">XIUYI'S GALLERY</a>
+</div>
 <script>
 
-    var width = 960,
-            height = 500;
+    var width = 1260,
+            height = 200;
 
     var nodes = d3.range(200).map(function() { return {radius: Math.random() * 12 + 4}; }),
             root = nodes[0],
@@ -76,3 +98,29 @@
     }
 
 </script>
+<div class="panel panel-default row">
+    <div class="col-xs-3">
+        <a ng-click="selectCategory()"
+            class="btn btn-block btn-default btn-lg">Home</a>
+        <a ng-repeat="vis in data.visuals | orderBy: 'category' | unique: 'category'"
+            ng-click="selectCategory(vis)" class="btn btn-block btn-default btn-lg">{{vis}}</a>
+        <button ng-click="go('#/blank.html')">steal vis</button>
+
+    </div>
+    <div class="col-xs-8">
+        <div class="well" ng-repeat="vis in data.visuals">
+            <h3>
+                <strong>{{vis.name}}</strong>
+                <span class="pull-right label label-primary">
+                    {{vis.createDate}}
+                </span>
+            </h3>
+            <span class="lead">{{vis.description}}</span>
+        </div>
+    </div>
+    
+</div>
+
+</body>
+
+</html>
